@@ -3,6 +3,9 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
@@ -15,7 +18,14 @@ public class StatMuseScraper {
         // Set to keep track of processed seasons to avoid duplicates
         Set<String> processedSeasons = new HashSet<>();
 
-        try {
+        // File where data will be saved
+        File file = new File("stephen_curry_stats.csv");
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+            // Write header for the CSV
+            writer.write("Season, Points, Assists, Rebounds");
+            writer.newLine();
+
             // Fetch the HTML content of the page
             Document doc = Jsoup.connect(url).get();
 
@@ -49,13 +59,16 @@ public class StatMuseScraper {
                     Double.parseDouble(assists); // Try to parse assists as a number
                     Double.parseDouble(rebounds); // Try to parse rebounds as a number
 
-                    // Print the extracted stats (or store them in variables/collections as needed)
-                    System.out.println("Season: " + season + ", Points: " + points + ", Assists: " + assists + ", Rebounds: " + rebounds);
+                    // Write the data to the CSV file
+                    writer.write(season + ", " + points + ", " + assists + ", " + rebounds);
+                    writer.newLine();
                 } catch (NumberFormatException e) {
                     // If parsing fails, skip the row (invalid data)
                     continue;
                 }
             }
+
+            System.out.println("Data saved to stephen_curry_stats.csv");
 
         } catch (IOException e) {
             e.printStackTrace();
